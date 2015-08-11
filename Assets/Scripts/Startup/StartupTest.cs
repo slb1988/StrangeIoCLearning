@@ -1,21 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GamePlayScene : Scene
-{
+public class StartupTest : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-        SceneMgr.Get().NotifySceneLoaded();
+	
 	}
 
     void OnGUI()
     {
-        if (GUILayout.Button("ReturnToHub"))
-        {
-            SceneMgr.Get().SetNextMode(SceneMgr.Mode.HUB);
-        }
         if (GUILayout.Button("Login"))
         {
             SceneMgr.Get().SetNextMode(SceneMgr.Mode.LOGIN);

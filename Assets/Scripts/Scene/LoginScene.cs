@@ -9,12 +9,24 @@ public class LoginScene : Scene {
     {
         base.Awake();
 
-        s_instance = null;
+        s_instance = this;
     }
 	// Use this for initialization
 	void Start () {
-	
-	}
+
+        SceneMgr.Get().NotifySceneLoaded();
+    }
+    void OnGUI()
+    {
+        if (GUILayout.Button("StartLogin"))
+        {
+            Invoke("Login", 0.5f);
+        }
+    }
+    void Login()
+    {
+        SceneMgr.Get().SetNextMode(SceneMgr.Mode.HUB);
+    }
 
     void OnDestroy()
     {

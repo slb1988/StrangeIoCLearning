@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 using System;
 using System.ComponentModel;
@@ -37,6 +38,7 @@ public class SceneMgr : MonoBehaviour
         [Description("TavernBrawl")]
         TAVERN_BRAWL,
     }
+    [SerializeField]
     private SceneMgr.Mode m_mode = SceneMgr.Mode.STARTUP;
     private List<SceneMgr.ScenePreUnloadListener> m_scenePreUnloadListeners = new List<SceneMgr.ScenePreUnloadListener>();
     private List<SceneMgr.SceneUnloadedListener> m_sceneUnloadedListeners = new List<SceneMgr.SceneUnloadedListener>();
@@ -46,17 +48,23 @@ public class SceneMgr : MonoBehaviour
     private static SceneMgr s_instance;
     private SceneMgr.Mode m_nextMode;
     private SceneMgr.Mode m_prevMode;
+    [SerializeField]
     private bool m_reloadMode;
 
     private Scene m_scene;
+    [SerializeField]
     private bool m_sceneLoaded;
+    [SerializeField]
     private bool m_transitioning;
+
+    public event System.Action Resetting;
 
     void Awake()
     {
         s_instance = this;
         this.m_transitioning = true;
 
+        ApplicationMgr.Get().Resetting += new System.Action(this.OnReset);
     }
     // Use this for initialization
     void Start()
@@ -66,7 +74,40 @@ public class SceneMgr : MonoBehaviour
 
     void OnDestroy()
     {
+        ApplicationMgr.Get().Resetting -= new System.Action(this.OnReset);
         SceneMgr.s_instance = (SceneMgr)null;
+    }
+
+    private void OnReset()
+    {
+        Log.Reset.Print("SceneMgr.OnReset()");
+        if (ApplicationMgr.IsPublic())
+            UnityEngine.Time.timeScale = 1f;
+        this.StopAllCoroutines();
+        //FatalErrorMgr.Get().AddErrorListener(new FatalErrorMgr.ErrorCallback(this.OnFatalError));
+        this.m_mode = SceneMgr.Mode.STARTUP;
+        this.m_nextMode = SceneMgr.Mode.INVALID;
+        this.m_prevMode = SceneMgr.Mode.INVALID;
+        this.m_reloadMode = false;
+        Scene prevScene = this.m_scene;
+        if ((UnityEngine.Object)prevScene != (UnityEngine.Object)null)
+            prevScene.PreUnload();
+        this.FireScenePreUnloadEvent(prevScene);
+        if ((UnityEngine.Object)this.m_scene != (UnityEngine.Object)null)
+        {
+            this.m_scene.Unload();
+            this.m_scene = (Scene)null;
+            this.m_sceneLoaded = false;
+        }
+        this.FireSceneUnloadedEvent(prevScene);
+        this.PostUnloadCleanup();
+        this.StartCoroutine("WaitThenLoadAssets");
+        Log.Reset.Print("\tSceneMgr.OnReset() completed");
+    }
+
+    IEnumerator WaitThenLoadAssets()
+    {
+        yield return null;
     }
 
     public static SceneMgr Get()
@@ -171,22 +212,15 @@ public class SceneMgr : MonoBehaviour
         this.m_nextMode = SceneMgr.Mode.INVALID;
         this.m_reloadMode = false;
 
-        //if (this.m_scene != null)
-        //{
-        //    this.StopCoroutine("SwitchMode");
-        //    this.StartCoroutine("SwitchMode");
-        //}
-        //else
+        if (this.m_scene != null)
+        {
+            this.StopCoroutine("SwitchMode");
+            this.StartCoroutine("SwitchMode");
+        }
+        else
             this.LoadMode();
     }
 
-    //[DebuggerHidden]
-    //private IEnumerator SwitchMode()
-    //{
-    //    return new SceneMgr.
-
-    //}
-    
     private bool ShouldUseSceneLoadDelays()
     {
         return this.m_mode != SceneMgr.Mode.LOGIN
@@ -331,16 +365,70 @@ public class SceneMgr : MonoBehaviour
             sceneLoadedListener.Fire(this.m_mode, this.m_scene);
     }
 
-    //private IEnumerator SwitchMode()
-    //{
-    //    return yield break;
-    //    //return (IEnumerator)new SceneMgr.
-    //}
+    IEnumerator SwitchMode()
+    {
+        Log.Reset.Print("SceneMgr.SwitchMode begin");
+        Scene prevScene = this.m_scene;
+        if (prevScene != null)
+            prevScene.PreUnload();
+        this.FireScenePreUnloadEvent(prevScene);
+        if (m_scene != null)
+        {
+            this.m_scene.Unload();
+            this.m_scene = null;
+            this.m_sceneLoaded = false;
+        }
+        this.FireSceneUnloadedEvent(prevScene);
+        this.PostUnloadCleanup();
+        this.FireScenePreLoadEvent();
+        yield return Application.LoadLevelAdditiveAsync(EnumUtils.GetString<SceneMgr.Mode>(this.m_mode));
+        this.FireSceneLoadedEvent();
+        Log.Reset.Print("SceneMgr.SwitchMode end");
+    }
 
     private void LoadMode()
     {
+        DestroyAllObjectsOnModeSwitch();
         this.FireScenePreLoadEvent();
         Application.LoadLevelAdditiveAsync(EnumUtils.GetString<SceneMgr.Mode>(this.m_mode));
+    }
+
+    private void PostUnloadCleanup()
+    {
+        UnityEngine.Time.captureFramerate = 0;
+        //if (this.m_performFullCleanup)
+        //    AssetCache.ClearAllCaches(false, true);
+        this.DestroyAllObjectsOnModeSwitch();
+        //if (!this.m_performFullCleanup)
+        //    return;
+        ApplicationMgr.Get().UnloadUnusedAssets();
+    }
+
+    private void DestroyAllObjectsOnModeSwitch()
+    {
+        foreach (GameObject go in (GameObject[])UnityEngine.Object.FindObjectsOfType(typeof(GameObject)))
+        {
+            if (this.ShouldDestroyOnModeSwitch(go))
+                UnityEngine.Object.DestroyImmediate((UnityEngine.Object)go);
+        }
+    }
+
+    private bool ShouldDestroyOnModeSwitch(GameObject go)
+    {
+      // 物体已清空  返回false
+      // 物体的父亲不为空 返回false
+      // 物体等于sceneMgr节点 返回false
+        return !((UnityEngine.Object)go == (UnityEngine.Object)null)
+            && !((UnityEngine.Object)go.transform.parent != (UnityEngine.Object)null)
+            && !((UnityEngine.Object)go == (UnityEngine.Object)this.gameObject);
+            //&& (!((UnityEngine.Object)PegUI.Get() != (UnityEngine.Object)null)
+            //    || !((UnityEngine.Object)go == (UnityEngine.Object)PegUI.Get().gameObject))
+            //&& ((!((UnityEngine.Object)Box.Get() != (UnityEngine.Object)null)
+            //    || !((UnityEngine.Object)go == (UnityEngine.Object)Box.Get().gameObject)
+            //    || !this.DoesModeShowBox(this.m_mode))
+            //    && (!DefLoader.Get().HasDef(go)
+            //    && !AssetLoader.Get().IsWaitingOnObject(go)
+            //    && !((UnityEngine.Object)go == (UnityEngine.Object)iTweenManager.Get().gameObject)));
     }
 
     private class ScenePreUnloadListener : EventListener<SceneMgr.ScenePreUnloadCallback>

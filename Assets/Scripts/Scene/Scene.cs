@@ -1,10 +1,20 @@
 ﻿using UnityEngine;
+using System;
 
 public class Scene : MonoBehaviour {
 
     protected virtual void Awake()
     {
-        SceneMgr.Get().SetScene(this);
+        try
+        {
+            var inst = SceneMgr.Get();
+            inst.SetScene(this);
+
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.ToString());
+        }
     }
 
     public virtual void PreUnload()
