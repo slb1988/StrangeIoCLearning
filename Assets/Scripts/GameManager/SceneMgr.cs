@@ -430,6 +430,94 @@ public class SceneMgr : MonoBehaviour
             //    && !AssetLoader.Get().IsWaitingOnObject(go)
             //    && !((UnityEngine.Object)go == (UnityEngine.Object)iTweenManager.Get().gameObject)));
     }
+    private void CacheModeForResume(SceneMgr.Mode mode)
+    {
+        if (PlatformSettings.OS != OSCategory.iOS && PlatformSettings.OS != OSCategory.Android)
+        {
+            return;
+        }
+        switch (mode)
+        {
+            //case SceneMgr.Mode.HUB:
+            //case SceneMgr.Mode.FRIENDLY:
+            //    Options.Get().SetInt(Option.LAST_SCENE_MODE, 0);
+            //    break;
+            //case SceneMgr.Mode.COLLECTIONMANAGER:
+            //case SceneMgr.Mode.TOURNAMENT:
+            //case SceneMgr.Mode.DRAFT:
+            //case SceneMgr.Mode.CREDITS:
+            //case SceneMgr.Mode.ADVENTURE:
+            //case SceneMgr.Mode.TAVERN_BRAWL:
+            //    Options.Get().SetInt(Option.LAST_SCENE_MODE, (int)mode);
+            //    break;
+        }
+    }
+    private bool DoesModeShowBox(SceneMgr.Mode mode)
+    {
+        switch (mode)
+        {
+            case SceneMgr.Mode.STARTUP:
+            case SceneMgr.Mode.GAMEPLAY:
+                return false;
+            case SceneMgr.Mode.LOGIN:
+            case SceneMgr.Mode.HUB:
+            //IL_1A:
+            //    switch (mode)
+            //    {
+            //        case SceneMgr.Mode.FATAL_ERROR:
+            //        case SceneMgr.Mode.RESET:
+            //            return false;
+            //    }
+                return true;
+        }
+       // goto IL_1A;
+        return false;
+    }
+    private void LoadModeFromModeSwitch()
+    {
+        bool flag = this.DoesModeShowBox(this.m_prevMode);
+        bool flag2 = this.DoesModeShowBox(this.m_mode);
+        //bool flag3 = !flag && flag2;
+        //if (flag3)
+        //{
+        //    this.LoadStringsWhenPossible(GameStringCategory.GLUE);
+        //    if (this.m_prevMode == SceneMgr.Mode.GAMEPLAY)
+        //    {
+        //        this.UnloadStringsWhenPossible(GameStringCategory.GAMEPLAY);
+        //        this.UnloadStringsWhenPossible(GameStringCategory.MISSION);
+        //    }
+        //    this.LoadBox(new AssetLoader.GameObjectCallback(this.OnBoxReloaded));
+        //    return;
+        //}
+        //bool flag4 = flag && !flag2;
+        //if (flag4)
+        //{
+        //    LoadingScreen.Get().SetAssetLoadStartTimestamp(this.m_boxLoadTimestamp);
+        //    this.m_boxLoadTimestamp = 0L;
+        //    this.UnloadStringsWhenPossible(GameStringCategory.GLUE);
+        //}
+        //bool flag5 = this.m_prevMode != SceneMgr.Mode.GAMEPLAY && this.m_mode == SceneMgr.Mode.GAMEPLAY;
+        //if (flag5)
+        //{
+        //    this.LoadStringsWhenPossible(GameStringCategory.GAMEPLAY);
+        //    this.LoadStringsWhenPossible(GameStringCategory.MISSION);
+        //}
+        this.LoadMode();
+    }
+    private void OnBoxReloaded(string name, GameObject screen, object callbackData)
+    {
+        if (screen == null)
+        {
+            UnityEngine.Debug.LogError(string.Format("SceneMgr.OnBoxReloaded() - failed to load {0}", name));
+            return;
+        }
+        this.LoadMode();
+    }
+    //private void LoadBox(AssetLoader.GameObjectCallback callback)
+    //{
+    //    this.m_boxLoadTimestamp = TimeUtils.BinaryStamp();
+    //    AssetLoader.Get().LoadUIScreen("TheBox", callback, null, false);
+    //}
 
     private class ScenePreUnloadListener : EventListener<SceneMgr.ScenePreUnloadCallback>
     {

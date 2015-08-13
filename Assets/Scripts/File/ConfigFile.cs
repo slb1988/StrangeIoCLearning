@@ -190,84 +190,87 @@ public class ConfigFile
 
   private bool Load(string path, bool ignoreUselessLines)
   {
-    this.m_path = (string) null;
-    this.m_lines.Clear();
-    if (!System.IO.File.Exists(path))
-    {
-      Debug.LogError((object) ("Error loading config file " + path));
-      return false;
-    }
-    int num = 1;
-    using (StreamReader streamReader = System.IO.File.OpenText(path))
-    {
-      string str1 = string.Empty;
-      while (streamReader.Peek() != -1)
+      this.m_path = null;
+      this.m_lines.Clear();
+      if (!File.Exists(path))
       {
-        string str2 = streamReader.ReadLine();
-        string str3 = str2.Trim();
-        if (!ignoreUselessLines || str3.Length > 0)
-        {
-          bool flag = str3.Length > 0 && (int) str3[0] == 59;
-          if (!ignoreUselessLines || !flag)
-          {
-            ConfigFile.Line line = new ConfigFile.Line();
-            line.m_raw = str2;
-            line.m_sectionName = str1;
-            if (flag)
-              line.m_type = ConfigFile.LineType.COMMENT;
-            else if (str3.Length > 0)
-            {
-              if ((int) str3[0] == 91)
-              {
-                if (str3.Length < 2 || (int) str3[str3.Length - 1] != 93)
-                {
-                  Debug.LogWarning((object) string.Format("ConfigFile.Load() - invalid section \"{0}\" on line {1} in file {2}", (object) str2, (object) num, (object) path));
-                  if (!ignoreUselessLines)
-                  {
-                    this.m_lines.Add(line);
-                    continue;
-                  }
-                  continue;
-                }
-                line.m_type = ConfigFile.LineType.SECTION;
-                line.m_sectionName = str1 = str3.Substring(1, str3.Length - 2);
-                this.m_lines.Add(line);
-                continue;
-              }
-              int length = str3.IndexOf('=');
-              if (length < 0)
-              {
-                Debug.LogWarning((object) string.Format("ConfigFile.Load() - invalid entry \"{0}\" on line {1} in file {2}", (object) str2, (object) num, (object) path));
-                if (!ignoreUselessLines)
-                {
-                  this.m_lines.Add(line);
-                  continue;
-                }
-                continue;
-              }
-              string str4 = str3.Substring(0, length).Trim();
-              string str5 = str3.Substring(length + 1, str3.Length - length - 1).Trim();
-              if (str5.Length > 2)
-              {
-                int index = str5.Length - 1;
-                if (((int) str5[0] == 34 || (int) str5[0] == 8220 || (int) str5[0] == 8221) && ((int) str5[index] == 34 || (int) str5[index] == 8220 || (int) str5[index] == 8221))
-                {
-                  str5 = str5.Substring(1, str5.Length - 2);
-                  line.m_quoteValue = true;
-                }
-              }
-              line.m_type = ConfigFile.LineType.ENTRY;
-              line.m_fullKey = string.Format("{0}.{1}", (object) str1, (object) str4);
-              line.m_lineKey = str4;
-              line.m_value = str5;
-            }
-            this.m_lines.Add(line);
-          }
-        }
+          Debug.LogError("Error loading config file " + path);
+          return false;
       }
-    }
-    this.m_path = path;
-    return true;
+      int num = 1;
+      using (StreamReader streamReader = File.OpenText(path))
+      {
+          string text = string.Empty;
+          while (streamReader.Peek() != -1)
+          {
+              string text2 = streamReader.ReadLine();
+              string text3 = text2.Trim();
+              if (!ignoreUselessLines || text3.Length > 0)
+              {
+                  bool flag = text3.Length > 0 && text3[0] == ';';
+                  if (!ignoreUselessLines || !flag)
+                  {
+                      ConfigFile.Line line = new ConfigFile.Line();
+                      line.m_raw = text2;
+                      line.m_sectionName = text;
+                      if (flag)
+                      {
+                          line.m_type = ConfigFile.LineType.COMMENT;
+                      }
+                      else if (text3.Length > 0)
+                      {
+                          if (text3[0] == '[')
+                          {
+                              if (text3.Length < 2 || text3[text3.Length - 1] != ']')
+                              {
+                                  Debug.LogWarning(string.Format("ConfigFile.Load() - invalid section \"{0}\" on line {1} in file {2}", text2, num, path));
+                                  if (!ignoreUselessLines)
+                                  {
+                                      this.m_lines.Add(line);
+                                  }
+                                  continue;
+                              }
+                              line.m_type = ConfigFile.LineType.SECTION;
+                              text = (line.m_sectionName = text3.Substring(1, text3.Length - 2));
+                              this.m_lines.Add(line);
+                              continue;
+                          }
+                          else
+                          {
+                              int num2 = text3.IndexOf('=');
+                              if (num2 < 0)
+                              {
+                                  Debug.LogWarning(string.Format("ConfigFile.Load() - invalid entry \"{0}\" on line {1} in file {2}", text2, num, path));
+                                  if (!ignoreUselessLines)
+                                  {
+                                      this.m_lines.Add(line);
+                                  }
+                                  continue;
+                              }
+                              string text4 = text3.Substring(0, num2).Trim();
+                              string text5 = text3.Substring(num2 + 1, text3.Length - num2 - 1).Trim();
+                              if (text5.Length > 2)
+                              {
+                                  int index = text5.Length - 1;
+                                  if ((text5[0] == '"' || text5[0] == '“' || text5[0] == '”') && (text5[index] == '"' || text5[index] == '“' || text5[index] == '”'))
+                                  {
+                                      text5 = text5.Substring(1, text5.Length - 2);
+                                      line.m_quoteValue = true;
+                                  }
+                              }
+                              line.m_type = ConfigFile.LineType.ENTRY;
+                              line.m_fullKey = string.Format("{0}.{1}", text, text4);
+                              line.m_lineKey = text4;
+                              line.m_value = text5;
+                          }
+                      }
+                      this.m_lines.Add(line);
+                  }
+              }
+          }
+      }
+      this.m_path = path;
+      return true;
   }
 
   private int FindSectionIndex(string sectionName)

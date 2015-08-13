@@ -209,137 +209,146 @@ public class CheatMgr : MonoBehaviour
 
   public string ProcessCheat(string inputCommand)
   {
-    string func = this.ExtractFunc(inputCommand);
-    if (func == null)
-    {
-      string str1 = "\"";
-      string str2 = inputCommand;
-      char[] chArray = new char[1];
-      int index = 0;
-      int num = 32;
-      chArray[index] = (char) num;
-      string str3 = str2.Split(chArray)[0];
-      string str4 = "\" cheat command not found!";
-      return str1 + str3 + str4;
-    }
-    int length = func.Length;
-    string str;
-    string[] args;
-    if (length == inputCommand.Length)
-    {
-      str = string.Empty;
-      args = new string[1]
+      string text = this.ExtractFunc(inputCommand);
+      if (text == null)
       {
-        string.Empty
-      };
-    }
-    else
-    {
-      str = inputCommand.Remove(0, length + 1);
-      MatchCollection matchCollection = Regex.Matches(str, "\\S+");
-      if (matchCollection.Count == 0)
+          return "\"" + inputCommand.Split(new char[]
+			{
+				' '
+			})[0] + "\" cheat command not found!";
+      }
+      int length = text.Length;
+      string text2;
+      string[] array;
+      if (length == inputCommand.Length)
       {
-        args = new string[1]
-        {
-          string.Empty
-        };
+          text2 = string.Empty;
+          array = new string[]
+			{
+				string.Empty
+			};
       }
       else
       {
-        args = new string[matchCollection.Count];
-        for (int index = 0; index < matchCollection.Count; ++index)
-          args[index] = matchCollection[index].Value;
+          text2 = inputCommand.Remove(0, length + 1);
+          MatchCollection matchCollection = Regex.Matches(text2, "\\S+");
+          if (matchCollection.Count == 0)
+          {
+              array = new string[]
+				{
+					string.Empty
+				};
+          }
+          else
+          {
+              array = new string[matchCollection.Count];
+              for (int i = 0; i < matchCollection.Count; i++)
+              {
+                  array[i] = matchCollection[i].Value;
+              }
+          }
       }
-    }
-    List<CheatMgr.ProcessCheatCallback> list = this.m_funcMap[this.GetOriginalFunc(func)];
-    bool flag = false;
-    for (int index = 0; index < list.Count; ++index)
-      flag = list[index](func, args, str) || flag;
-    if (this.m_cheatHistory.Count < 1 || !this.m_cheatHistory[0].Equals(inputCommand))
-      this.m_cheatHistory.Insert(0, inputCommand);
-    this.m_cheatHistoryIndex = 0;
-    this.m_cheatTextBeforeScrollingThruHistory = (string) null;
-    if (!flag)
-      return "\"" + func + "\" cheat command executed, but failed!";
-    return (string) null;
+      string originalFunc = this.GetOriginalFunc(text);
+      List<CheatMgr.ProcessCheatCallback> list = this.m_funcMap[originalFunc];
+      bool flag = false;
+      for (int j = 0; j < list.Count; j++)
+      {
+          CheatMgr.ProcessCheatCallback processCheatCallback = list[j];
+          flag = (processCheatCallback(text, array, text2) || flag);
+      }
+      if (this.m_cheatHistory.Count < 1 || !this.m_cheatHistory[0].Equals(inputCommand))
+      {
+          this.m_cheatHistory.Insert(0, inputCommand);
+      }
+      this.m_cheatHistoryIndex = 0;
+      this.m_cheatTextBeforeScrollingThruHistory = null;
+      if (!flag)
+      {
+          return "\"" + text + "\" cheat command executed, but failed!";
+      }
+      return null;
   }
 
   private string ExtractFunc(string inputCommand)
   {
-    string str1 = inputCommand;
-    char[] chArray = new char[1];
-    int index1 = 0;
-    int num = 47;
-    chArray[index1] = (char) num;
-    inputCommand = str1.TrimStart(chArray);
-    inputCommand = inputCommand.Trim();
-    int index2 = 0;
-    List<string> funcs = new List<string>();
-    using (Map<string, List<CheatMgr.ProcessCheatCallback>>.KeyCollection.Enumerator enumerator = this.m_funcMap.Keys.GetEnumerator())
-    {
-      while (enumerator.MoveNext())
+      inputCommand = inputCommand.TrimStart(new char[]
+		{
+			'/'
+		});
+      inputCommand = inputCommand.Trim();
+      int num = 0;
+      List<string> list = new List<string>();
+      foreach (string current in this.m_funcMap.Keys)
       {
-        string current = enumerator.Current;
-        funcs.Add(current);
-        if (current.Length > funcs[index2].Length)
-          index2 = funcs.Count - 1;
+          list.Add(current);
+          if (current.Length > list[num].Length)
+          {
+              num = list.Count - 1;
+          }
       }
-    }
-    using (Map<string, string>.KeyCollection.Enumerator enumerator = this.m_cheatAlias.Keys.GetEnumerator())
-    {
-      while (enumerator.MoveNext())
+      foreach (string current2 in this.m_cheatAlias.Keys)
       {
-        string current = enumerator.Current;
-        funcs.Add(current);
-        if (current.Length > funcs[index2].Length)
-          index2 = funcs.Count - 1;
+          list.Add(current2);
+          if (current2.Length > list[num].Length)
+          {
+              num = list.Count - 1;
+          }
       }
-    }
-    int index3;
-    for (index3 = 0; index3 < inputCommand.Length; ++index3)
-    {
-      char c = inputCommand[index3];
-      int index4 = 0;
-      while (index4 < funcs.Count)
+      int i;
+      for (i = 0; i < inputCommand.Length; i++)
       {
-        string str2 = funcs[index4];
-        if (index3 == str2.Length)
-        {
-          if (char.IsWhiteSpace(c))
-            return str2;
-          funcs.RemoveAt(index4);
-          if (index4 <= index2)
-            index2 = this.ComputeLongestFuncIndex(funcs);
-        }
-        else if ((int) str2[index3] != (int) c)
-        {
-          funcs.RemoveAt(index4);
-          if (index4 <= index2)
-            index2 = this.ComputeLongestFuncIndex(funcs);
-        }
-        else
-          ++index4;
+          char c = inputCommand[i];
+          int j = 0;
+          while (j < list.Count)
+          {
+              string text = list[j];
+              if (i == text.Length)
+              {
+                  if (char.IsWhiteSpace(c))
+                  {
+                      return text;
+                  }
+                  list.RemoveAt(j);
+                  if (j <= num)
+                  {
+                      num = this.ComputeLongestFuncIndex(list);
+                  }
+              }
+              else if (text[i] != c)
+              {
+                  list.RemoveAt(j);
+                  if (j <= num)
+                  {
+                      num = this.ComputeLongestFuncIndex(list);
+                  }
+              }
+              else
+              {
+                  j++;
+              }
+          }
+          if (list.Count == 0)
+          {
+              return null;
+          }
       }
-      if (funcs.Count == 0)
-        return (string) null;
-    }
-    if (funcs.Count > 1)
-    {
-      using (List<string>.Enumerator enumerator = funcs.GetEnumerator())
+      if (list.Count > 1)
       {
-        while (enumerator.MoveNext())
-        {
-          string current = enumerator.Current;
-          if (inputCommand == current)
-            return current;
-        }
+          foreach (string current3 in list)
+          {
+              if (inputCommand == current3)
+              {
+                  return current3;
+              }
+          }
+          return null;
       }
-      return (string) null;
-    }
-    string str3 = funcs[0];
-    if (index3 < str3.Length)
-      return (string) null;
-    return str3;
+      string text2 = list[0];
+      if (i < text2.Length)
+      {
+          return null;
+      }
+      return text2;
   }
 
   private int ComputeLongestFuncIndex(List<string> funcs)

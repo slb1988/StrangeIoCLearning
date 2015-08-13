@@ -8,6 +8,26 @@ using UnityEngine;
 
 public class FullScreenEffects : MonoBehaviour
 {
+    private const int NO_WORK_FRAMES_BEFORE_DEACTIVATE = 2;
+
+    private const string BLUR_SHADER_NAME = "Custom/FullScreen/Blur";
+
+    private const string BLUR_VIGNETTING_SHADER_NAME = "Custom/FullScreen/BlurVignetting";
+
+    private const string BLUR_DESATURATION_SHADER_NAME = "Custom/FullScreen/DesaturationBlur";
+
+    private const string BLEND_SHADER_NAME = "Custom/FullScreen/Blend";
+
+    private const string VIGNETTING_SHADER_NAME = "Custom/FullScreen/Vignetting";
+
+    private const string BLEND_TO_COLOR_SHADER_NAME = "Custom/FullScreen/BlendToColor";
+
+    private const string DESATURATION_SHADER_NAME = "Custom/FullScreen/Desaturation";
+
+    private const string DESATURATION_VIGNETTING_SHADER_NAME = "Custom/FullScreen/DesaturationVignetting";
+
+    private const string BLUR_DESATURATION_VIGNETTING_SHADER_NAME = "Custom/FullScreen/BlurDesaturationVignetting";
+
   private int m_LowQualityFreezeBufferSize = 512;
   public float m_BlurBlend = 1f;
   private float m_BlurAmount = 2f;
@@ -15,16 +35,6 @@ public class FullScreenEffects : MonoBehaviour
   private float m_PreviousBlurAmount = 1f;
   private float m_PreviousBlurBrightness = 1f;
   private Color m_BlendToColor = Color.white;
-  private const int NO_WORK_FRAMES_BEFORE_DEACTIVATE = 2;
-  private const string BLUR_SHADER_NAME = "Custom/FullScreen/Blur";
-  private const string BLUR_VIGNETTING_SHADER_NAME = "Custom/FullScreen/BlurVignetting";
-  private const string BLUR_DESATURATION_SHADER_NAME = "Custom/FullScreen/DesaturationBlur";
-  private const string BLEND_SHADER_NAME = "Custom/FullScreen/Blend";
-  private const string VIGNETTING_SHADER_NAME = "Custom/FullScreen/Vignetting";
-  private const string BLEND_TO_COLOR_SHADER_NAME = "Custom/FullScreen/BlendToColor";
-  private const string DESATURATION_SHADER_NAME = "Custom/FullScreen/Desaturation";
-  private const string DESATURATION_VIGNETTING_SHADER_NAME = "Custom/FullScreen/DesaturationVignetting";
-  private const string BLUR_DESATURATION_VIGNETTING_SHADER_NAME = "Custom/FullScreen/BlurDesaturationVignetting";
   private const int BLUR_BUFFER_SIZE = 512;
   private const float BLUR_SECOND_PASS_REDUCTION = 0.5f;
   private const float BLUR_PASS_1_OFFSET = 1f;
@@ -68,79 +78,79 @@ public class FullScreenEffects : MonoBehaviour
 
   protected Material blurMaterial
   {
-    get
-    {
-      if ((Object) this.m_BlurMaterial == (Object) null)
+      get
       {
-        this.m_BlurMaterial = new Material(this.m_BlurShader);
-        SceneUtils.SetHideFlags((Object) this.m_BlurMaterial, HideFlags.DontSave);
+          if (this.m_BlurMaterial == null)
+          {
+              this.m_BlurMaterial = new Material(this.m_BlurShader);
+              SceneUtils.SetHideFlags(this.m_BlurMaterial, HideFlags.DontSave);
+          }
+          return this.m_BlurMaterial;
       }
-      return this.m_BlurMaterial;
-    }
   }
 
   protected Material blurVignettingMaterial
   {
     get
-    {
-      if ((Object) this.m_BlurVignettingMaterial == (Object) null)
       {
-        this.m_BlurVignettingMaterial = new Material(this.m_BlurVignettingShader);
-        SceneUtils.SetHideFlags((Object) this.m_BlurVignettingMaterial, HideFlags.DontSave);
-      }
-      return this.m_BlurVignettingMaterial;
+          if (this.m_BlurVignettingMaterial == null)
+          {
+              this.m_BlurVignettingMaterial = new Material(this.m_BlurVignettingShader);
+              SceneUtils.SetHideFlags(this.m_BlurVignettingMaterial, HideFlags.DontSave);
+          }
+          return this.m_BlurVignettingMaterial;
     }
   }
 
   protected Material blurDesatMaterial
   {
     get
-    {
-      if ((Object) this.m_BlurDesatMaterial == (Object) null)
       {
-        this.m_BlurDesatMaterial = new Material(this.m_BlurDesaturationShader);
-        SceneUtils.SetHideFlags((Object) this.m_BlurDesatMaterial, HideFlags.DontSave);
-      }
-      return this.m_BlurDesatMaterial;
+          if (this.m_BlurDesatMaterial == null)
+          {
+              this.m_BlurDesatMaterial = new Material(this.m_BlurDesaturationShader);
+              SceneUtils.SetHideFlags(this.m_BlurDesatMaterial, HideFlags.DontSave);
+          }
+          return this.m_BlurDesatMaterial;
     }
   }
 
   protected Material blendMaterial
   {
     get
-    {
-      if ((Object) this.m_BlendMaterial == (Object) null)
       {
-        this.m_BlendMaterial = new Material(this.m_BlendShader);
-        SceneUtils.SetHideFlags((Object) this.m_BlendMaterial, HideFlags.DontSave);
-      }
-      return this.m_BlendMaterial;
+          if (this.m_BlendMaterial == null)
+          {
+              this.m_BlendMaterial = new Material(this.m_BlendShader);
+              SceneUtils.SetHideFlags(this.m_BlendMaterial, HideFlags.DontSave);
+          }
+          return this.m_BlendMaterial;
     }
   }
 
   protected Material VignettingMaterial
   {
     get
-    {
-      if ((Object) this.m_VignettingMaterial == (Object) null)
       {
-        this.m_VignettingMaterial = new Material(this.m_VignettingShader);
-        SceneUtils.SetHideFlags((Object) this.m_VignettingMaterial, HideFlags.DontSave);
-      }
-      return this.m_VignettingMaterial;
+          if (this.m_VignettingMaterial == null)
+          {
+              this.m_VignettingMaterial = new Material(this.m_VignettingShader);
+              SceneUtils.SetHideFlags(this.m_VignettingMaterial, HideFlags.DontSave);
+          }
+          return this.m_VignettingMaterial;
     }
   }
 
   protected Material BlendToColorMaterial
   {
     get
-    {
-      if ((Object) this.m_BlendToColorMaterial == (Object) null)
       {
-        this.m_BlendToColorMaterial = new Material(this.m_BlendToColorShader);
-        SceneUtils.SetHideFlags((Object) this.m_BlendToColorMaterial, HideFlags.DontSave);
-      }
-      return this.m_BlendToColorMaterial;
+          if (this.m_BlendToColorMaterial == null)
+          {
+              this.m_BlendToColorMaterial = new Material(this.m_BlendToColorShader);
+              SceneUtils.SetHideFlags(this.m_BlendToColorMaterial, HideFlags.DontSave);
+          }
+          return this.m_BlendToColorMaterial;
     }
   }
 
@@ -364,34 +374,53 @@ public class FullScreenEffects : MonoBehaviour
 
   protected void OnDisable()
   {
-    this.SetDefaults();
-    if ((bool) ((Object) this.m_BlurMaterial))
-      Object.Destroy((Object) this.m_BlurMaterial);
-    if ((bool) ((Object) this.m_BlurVignettingMaterial))
-      Object.Destroy((Object) this.m_BlurVignettingMaterial);
-    if ((bool) ((Object) this.m_BlurDesatMaterial))
-      Object.Destroy((Object) this.m_BlurDesatMaterial);
-    if ((bool) ((Object) this.m_BlendMaterial))
-      Object.Destroy((Object) this.m_BlendMaterial);
-    if ((bool) ((Object) this.m_VignettingMaterial))
-      Object.Destroy((Object) this.m_VignettingMaterial);
-    if ((bool) ((Object) this.m_BlendToColorMaterial))
-      Object.Destroy((Object) this.m_BlendToColorMaterial);
-    if ((bool) ((Object) this.m_DesaturationMaterial))
-      Object.Destroy((Object) this.m_DesaturationMaterial);
-    if ((bool) ((Object) this.m_DesaturationVignettingMaterial))
-      Object.Destroy((Object) this.m_DesaturationVignettingMaterial);
-    if (!(bool) ((Object) this.m_BlurDesaturationVignettingMaterial))
-      return;
-    Object.Destroy((Object) this.m_BlurDesaturationVignettingMaterial);
+      this.SetDefaults();
+      if (this.m_BlurMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlurMaterial);
+      }
+      if (this.m_BlurVignettingMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlurVignettingMaterial);
+      }
+      if (this.m_BlurDesatMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlurDesatMaterial);
+      }
+      if (this.m_BlendMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlendMaterial);
+      }
+      if (this.m_VignettingMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_VignettingMaterial);
+      }
+      if (this.m_BlendToColorMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlendToColorMaterial);
+      }
+      if (this.m_DesaturationMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_DesaturationMaterial);
+      }
+      if (this.m_DesaturationVignettingMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_DesaturationVignettingMaterial);
+      }
+      if (this.m_BlurDesaturationVignettingMaterial)
+      {
+          UnityEngine.Object.Destroy(this.m_BlurDesaturationVignettingMaterial);
+      }
   }
 
   protected void OnDestroy()
   {
-    CheatMgr cheatMgr = CheatMgr.Get();
-    if (!((Object) cheatMgr != (Object) null))
-      return;
-    cheatMgr.UnregisterCheatHandler("wireframe", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_RenderWireframe));
+      CheatMgr cheatMgr = CheatMgr.Get();
+      if (cheatMgr != null)
+      {
+          cheatMgr.UnregisterCheatHandler("wireframe",
+              new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_RenderWireframe));
+      }
   }
 
   protected void Awake()
@@ -401,88 +430,106 @@ public class FullScreenEffects : MonoBehaviour
 
   protected void Start()
   {
-    CheatMgr cheatMgr = CheatMgr.Get();
-    if ((Object) cheatMgr != (Object) null)
-      cheatMgr.RegisterCheatHandler("wireframe", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_RenderWireframe), (string) null, (string) null, (string) null);
-    this.gameObject.GetComponent<Camera>().clearFlags = CameraClearFlags.Color;
-    if (!SystemInfo.supportsImageEffects)
-    {
-      Debug.LogError((object) "Fullscreen Effects not supported");
-      this.enabled = false;
-    }
-    else
-    {
-      if ((Object) this.m_BlurShader == (Object) null)
-        this.m_BlurShader = ShaderUtils.FindShader("Custom/FullScreen/Blur");
-      if (!(bool) ((Object) this.m_BlurShader))
+      CheatMgr cheatMgr = CheatMgr.Get();
+      if (cheatMgr != null)
       {
-        Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/Blur");
-        this.enabled = false;
+          cheatMgr.RegisterCheatHandler("wireframe", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_RenderWireframe), null, null, null);
       }
-      if (!(bool) ((Object) this.m_BlurShader) || !this.blurMaterial.shader.isSupported)
+      Camera component = base.gameObject.GetComponent<Camera>();
+      component.clearFlags = CameraClearFlags.Color;
+      if (!SystemInfo.supportsImageEffects)
       {
-        Debug.LogError((object) "Fullscreen Effect Shader not supported: Custom/FullScreen/Blur");
-        this.enabled = false;
-      }
-      else
-      {
-        if ((Object) this.m_BlurVignettingShader == (Object) null)
-          this.m_BlurVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/BlurVignetting");
-        if (!(bool) ((Object) this.m_BlurVignettingShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlurVignetting");
-          this.enabled = false;
-        }
-        if ((Object) this.m_BlurDesaturationShader == (Object) null)
-          this.m_BlurDesaturationShader = ShaderUtils.FindShader("Custom/FullScreen/DesaturationBlur");
-        if (!(bool) ((Object) this.m_BlurDesaturationShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/DesaturationBlur");
-          this.enabled = false;
-        }
-        if ((Object) this.m_BlendShader == (Object) null)
-          this.m_BlendShader = ShaderUtils.FindShader("Custom/FullScreen/Blend");
-        if (!(bool) ((Object) this.m_BlendShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/Blend");
-          this.enabled = false;
-        }
-        if ((Object) this.m_VignettingShader == (Object) null)
-          this.m_VignettingShader = ShaderUtils.FindShader("Custom/FullScreen/Vignetting");
-        if (!(bool) ((Object) this.m_VignettingShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/Vignetting");
-          this.enabled = false;
-        }
-        if ((Object) this.m_BlendToColorShader == (Object) null)
-          this.m_BlendToColorShader = ShaderUtils.FindShader("Custom/FullScreen/BlendToColor");
-        if (!(bool) ((Object) this.m_BlendToColorShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlendToColor");
-          this.enabled = false;
-        }
-        if ((Object) this.m_DesaturationShader == (Object) null)
-          this.m_DesaturationShader = ShaderUtils.FindShader("Custom/FullScreen/Desaturation");
-        if (!(bool) ((Object) this.m_DesaturationShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/Desaturation");
-          this.enabled = false;
-        }
-        if ((Object) this.m_DesaturationVignettingShader == (Object) null)
-          this.m_DesaturationVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/DesaturationVignetting");
-        if (!(bool) ((Object) this.m_DesaturationVignettingShader))
-        {
-          Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/DesaturationVignetting");
-          this.enabled = false;
-        }
-        if ((Object) this.m_BlurDesaturationVignettingShader == (Object) null)
-          this.m_BlurDesaturationVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/BlurDesaturationVignetting");
-        if ((bool) ((Object) this.m_BlurDesaturationVignettingShader))
+          Debug.LogError("Fullscreen Effects not supported");
+          //base.enabled = false;
           return;
-        Debug.LogError((object) "Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlurDesaturationVignetting");
-        this.enabled = false;
       }
-    }
+      if (this.m_BlurShader == null)
+      {
+          this.m_BlurShader = ShaderUtils.FindShader("Custom/FullScreen/Blur");
+      }
+      if (!this.m_BlurShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/Blur");
+          //base.enabled = false;
+      }
+      if (!this.m_BlurShader || !this.blurMaterial.shader.isSupported)
+      {
+          Debug.LogError("Fullscreen Effect Shader not supported: Custom/FullScreen/Blur");
+          //base.enabled = false;
+          return;
+      }
+      if (this.m_BlurVignettingShader == null)
+      {
+          this.m_BlurVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/BlurVignetting");
+      }
+      if (!this.m_BlurVignettingShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlurVignetting");
+          //base.enabled = false;
+      }
+      if (this.m_BlurDesaturationShader == null)
+      {
+          this.m_BlurDesaturationShader = ShaderUtils.FindShader("Custom/FullScreen/DesaturationBlur");
+      }
+      if (!this.m_BlurDesaturationShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/DesaturationBlur");
+          //base.enabled = false;
+      }
+      if (this.m_BlendShader == null)
+      {
+          this.m_BlendShader = ShaderUtils.FindShader("Custom/FullScreen/Blend");
+      }
+      if (!this.m_BlendShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/Blend");
+          //base.enabled = false;
+      }
+      if (this.m_VignettingShader == null)
+      {
+          this.m_VignettingShader = ShaderUtils.FindShader("Custom/FullScreen/Vignetting");
+      }
+      if (!this.m_VignettingShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/Vignetting");
+          //base.enabled = false;
+      }
+      if (this.m_BlendToColorShader == null)
+      {
+          this.m_BlendToColorShader = ShaderUtils.FindShader("Custom/FullScreen/BlendToColor");
+      }
+      if (!this.m_BlendToColorShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlendToColor");
+          //base.enabled = false;
+      }
+      if (this.m_DesaturationShader == null)
+      {
+          this.m_DesaturationShader = ShaderUtils.FindShader("Custom/FullScreen/Desaturation");
+      }
+      if (!this.m_DesaturationShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/Desaturation");
+          //base.enabled = false;
+      }
+      if (this.m_DesaturationVignettingShader == null)
+      {
+          this.m_DesaturationVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/DesaturationVignetting");
+      }
+      if (!this.m_DesaturationVignettingShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/DesaturationVignetting");
+          //base.enabled = false;
+      }
+      if (this.m_BlurDesaturationVignettingShader == null)
+      {
+          this.m_BlurDesaturationVignettingShader = ShaderUtils.FindShader("Custom/FullScreen/BlurDesaturationVignetting");
+      }
+      if (!this.m_BlurDesaturationVignettingShader)
+      {
+          Debug.LogError("Fullscreen Effect Failed to load Shader: Custom/FullScreen/BlurDesaturationVignetting");
+          //base.enabled = false;
+      }
   }
 
   private void Update()
@@ -622,8 +669,9 @@ public class FullScreenEffects : MonoBehaviour
     }
   }
 
-  private void OnRenderImage(RenderTexture source, RenderTexture destination)
+  /*private void OnRenderImage(RenderTexture source, RenderTexture destination)
   {
+      return;
     if ((Object) source == (Object) null || source.width == 0 || source.height == 0)
       return;
     bool flag = false;
@@ -766,18 +814,18 @@ public class FullScreenEffects : MonoBehaviour
     }
     if (flag)
       return;
-    Material blendMaterial1 = this.blendMaterial;
-    blendMaterial1.SetFloat("_Amount", 0.0f);
-    blendMaterial1.SetTexture("_BlendTex", (Texture) null);
-    Graphics.Blit((Texture) source, destination, blendMaterial1);
-    if (this.m_DeactivateFrameCount > 2)
-    {
-      this.m_DeactivateFrameCount = 0;
-      this.Disable();
-    }
-    else
-      ++this.m_DeactivateFrameCount;
-  }
+    //Material blendMaterial1 = this.blendMaterial;
+    //blendMaterial1.SetFloat("_Amount", 0.0f);
+    //blendMaterial1.SetTexture("_BlendTex", (Texture) null);
+    //Graphics.Blit((Texture)source, destination);//, blendMaterial1);
+    //if (this.m_DeactivateFrameCount > 2)
+    //{
+    //  this.m_DeactivateFrameCount = 0;
+    //  this.Disable();
+    //}
+    //else
+    //  ++this.m_DeactivateFrameCount;
+  }*/
 
   private void OnPreRender()
   {

@@ -309,18 +309,30 @@ public class LoadingScreen : MonoBehaviour
 
     private void OnSceneUnloaded(SceneMgr.Mode prevMode, Scene prevScene, object userData)
     {
-        Logger logger1 = Log.LoadingScreen;
-        //string format1 = "LoadingScreen.OnSceneUnloaded() - prevMode={0} nextMode={1} m_phase={2}";
-        //logger1.Print(format1, objArray1);
+        Log.LoadingScreen.Print("LoadingScreen.OnSceneUnloaded() - prevMode={0} nextMode={1} m_phase={2}", new object[]
+		{
+			prevMode,
+			SceneMgr.Get().GetMode(),
+			this.m_phase
+		});
+        if (this.m_phase != LoadingScreen.Phase.WAITING_FOR_SCENE_UNLOAD)
+        {
+            return;
+        }
+        this.m_assetLoadEndTimestamp = this.m_assetLoadNextStartTimestamp;
+        Log.LoadingScreen.Print("LoadingScreen.OnSceneUnloaded() - m_assetLoadEndTimestamp={0}", new object[]
+		{
+			this.m_assetLoadEndTimestamp
+		});
         this.m_phase = LoadingScreen.Phase.WAITING_FOR_SCENE_LOAD;
         this.m_prevTransitionParams = this.m_transitionParams;
         this.m_transitionParams = new LoadingScreen.TransitionParams();
-        this.m_transitionParams.ClearPreviousAssets = prevMode != SceneMgr.Get().GetMode();
+        this.m_transitionParams.ClearPreviousAssets = (prevMode != SceneMgr.Get().GetMode());
         this.m_prevTransitionParams.AutoAddObjects();
         this.m_prevTransitionParams.FixupCameras(this.m_fxCamera);
-        this.m_prevTransitionParams.PreserveObjects(this.transform);
-        this.m_originalPosX = this.transform.position.x;
-        //TransformUtil.SetPosX(this.gameObject, 5000f);
+        this.m_prevTransitionParams.PreserveObjects(base.transform);
+        this.m_originalPosX = base.transform.position.x;
+        TransformUtil.SetPosX(base.gameObject, 5000f);
     }
 
     void OnGUI()
@@ -364,6 +376,44 @@ public class LoadingScreen : MonoBehaviour
 
     private void FadeOut()
     {
+        Log.LoadingScreen.Print("LoadingScreen.FadeOut()", new object[0]);
+        this.m_phase = LoadingScreen.Phase.FADING_OUT;
+        if (!this.m_prevTransitionParams.IsFadeOutEnabled())
+        {
+            this.OnFadeOutComplete();
+            return;
+        }
+        CameraFade cameraFade = base.GetComponent<CameraFade>();
+        if (cameraFade == null)
+        {
+            UnityEngine.Debug.LogError("LoadingScreen FadeOut(): Failed to find CameraFade component");
+            return;
+        }
+        cameraFade.m_Color = this.m_prevTransitionParams.GetFadeColor();
+        Action<object> action = delegate(object amount)
+        {
+            cameraFade.m_Fade = (float)amount;
+        };
+        Hashtable args = iTween.Hash(new object[]
+		{
+			"time",
+			this.m_FadeOutSec,
+			"from",
+			cameraFade.m_Fade,
+			"to",
+			1f,
+			"onupdate",
+			action,
+			"onupdatetarget",
+			base.gameObject,
+			"oncomplete",
+			"OnFadeOutComplete",
+			"oncompletetarget",
+			base.gameObject,
+			"name",
+			"Fade"
+		});
+        iTween.ValueTo(base.gameObject, args);
     }
 
     private void OnFadeOutComplete()
@@ -375,31 +425,45 @@ public class LoadingScreen : MonoBehaviour
     CameraFade cameraFade;
     private void FadeIn()
     {
-        Log.LoadingScreen.Print("LoadingScreen.FadeIn()");
+        Log.LoadingScreen.Print("LoadingScreen.FadeIn()", new object[0]);
         this.m_phase = LoadingScreen.Phase.FADING_IN;
         if (!this.m_prevTransitionParams.IsFadeInEnabled())
         {
             this.OnFadeInComplete();
+            return;
         }
-        else
+        CameraFade cameraFade = base.GetComponent<CameraFade>();
+        if (cameraFade == null)
         {
-            cameraFade.m_Color = this.m_prevTransitionParams.GetFadeColor();
-
-            object[] objArray = new object[16];
-            objArray[0] = "time";
-            objArray[1] = this.m_FadeInSec;
-            objArray[2] = "from";
-            objArray[3] = 1.0f;
-            objArray[4] = "to";
-            objArray[5] = 0f;
-            objArray[6] = "onupdate";
-            objArray[7] = "";
-            objArray[8] = "onupdatetarget";
-            objArray[9] = gameObject;
-            objArray[10] = "oncomplete";
-            objArray[11] = "OnFadeInComplete";
-            iTween.ValueTo(this.gameObject, iTween.Hash(objArray));
+            UnityEngine.Debug.LogError("LoadingScreen FadeIn(): Failed to find CameraFade component");
+            return;
         }
+        cameraFade.m_Color = this.m_prevTransitionParams.GetFadeColor();
+        Action<object> action = delegate(object amount)
+        {
+            cameraFade.m_Fade = (float)amount;
+        };
+        action(1f);
+        Hashtable args = iTween.Hash(new object[]
+		{
+			"time",
+			this.m_FadeInSec,
+			"from",
+			1f,
+			"to",
+			0f,
+			"onupdate",
+			action,
+			"onupdatetarget",
+			base.gameObject,
+			"oncomplete",
+			"OnFadeInComplete",
+			"oncompletetarget",
+			base.gameObject,
+			"name",
+			"Fade"
+		});
+        iTween.ValueTo(base.gameObject, args);
     }
 
     private void OnFadeInComplete()

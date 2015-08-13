@@ -5,10 +5,12 @@
 // Assembly location: E:\game\Hearthstone\Hearthstone_Data\Managed\Assembly-CSharp.dll
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 public class Log
 {
+    private const string CONFIG_FILE_NAME = "log.config";
+
   public static Logger Bob = new Logger("Bob");
   public static Logger Mike = new Logger("Mike");
   public static Logger Brian = new Logger("Brian");
@@ -53,25 +55,35 @@ public class Log
   public static Logger InnKeepersSpecial = new Logger("InnKeepersSpecial");
   public static Logger EventTiming = new Logger("EventTiming");
   public static Logger Arena = new Logger("Arena");
-  private const string CONFIG_FILE_NAME = "log.config";
-  private readonly LogInfo[] DEFAULT_LOG_INFOS;
+  private readonly LogInfo[] DEFAULT_LOG_INFOS = new LogInfo[]
+	{
+		new LogInfo
+		{
+			m_name = "Party",
+			m_filePrinting = true
+		}
+	};
   private static Log s_instance;
   private Map<string, LogInfo> m_logInfos;
 
   public Log()
   {
-    LogInfo[] logInfoArray = new LogInfo[1];
-    int index = 0;
-    LogInfo logInfo = new LogInfo()
-    {
-      m_name = "Party",
-      m_filePrinting = true
-    };
-    logInfoArray[index] = logInfo;
-    this.DEFAULT_LOG_INFOS = logInfoArray;
-    this.m_logInfos = new Map<string, LogInfo>();
-    // ISSUE: explicit constructor call
-    //base.\u002Ector();
+      string text = string.Format("{0}/{1}", FileUtils.PersistentDataPath, "log.config");
+      if (File.Exists(text))
+      {
+          this.m_logInfos.Clear();
+          this.LoadConfig(text);
+      }
+      LogInfo[] dEFAULT_LOG_INFOS = this.DEFAULT_LOG_INFOS;
+      for (int i = 0; i < dEFAULT_LOG_INFOS.Length; i++)
+      {
+          LogInfo logInfo = dEFAULT_LOG_INFOS[i];
+          if (!this.m_logInfos.ContainsKey(logInfo.m_name))
+          {
+              this.m_logInfos.Add(logInfo.m_name, logInfo);
+          }
+      }
+      Log.ConfigFile.Print("log.config location: " + text);
   }
 
   public static Log Get()
@@ -114,57 +126,63 @@ public class Log
 
   private void LoadConfig(string path)
   {
-    global::ConfigFile configFile = new global::ConfigFile();
-    if (!configFile.LightLoad(path))
-      return;
-    using (List<global::ConfigFile.Line>.Enumerator enumerator = configFile.GetLines().GetEnumerator())
-    {
-      while (enumerator.MoveNext())
+      ConfigFile configFile = new ConfigFile();
+      if (!configFile.LightLoad(path))
       {
-        global::ConfigFile.Line current = enumerator.Current;
-        string key = current.m_sectionName;
-        string str1 = current.m_lineKey;
-        string str2 = current.m_value;
-        LogInfo logInfo;
-        if (!this.m_logInfos.TryGetValue(key, out logInfo))
-        {
-          logInfo = new LogInfo()
-          {
-            m_name = key
-          };
-          this.m_logInfos.Add(logInfo.m_name, logInfo);
-        }
-        if (str1.Equals("ConsolePrinting", StringComparison.OrdinalIgnoreCase))
-          logInfo.m_consolePrinting = GeneralUtils.ForceBool(str2);
-        else if (str1.Equals("ScreenPrinting", StringComparison.OrdinalIgnoreCase))
-          logInfo.m_screenPrinting = GeneralUtils.ForceBool(str2);
-        else if (str1.Equals("FilePrinting", StringComparison.OrdinalIgnoreCase))
-          logInfo.m_filePrinting = GeneralUtils.ForceBool(str2);
-        else if (str1.Equals("MinLevel", StringComparison.OrdinalIgnoreCase))
-        {
-          try
-          {
-            LogLevel @enum = EnumUtils.GetEnum<LogLevel>(str2, StringComparison.OrdinalIgnoreCase);
-            logInfo.m_minLevel = @enum;
-          }
-          catch (ArgumentException ex)
-          {
-          }
-        }
-        else if (str1.Equals("DefaultLevel", StringComparison.OrdinalIgnoreCase))
-        {
-          try
-          {
-            LogLevel @enum = EnumUtils.GetEnum<LogLevel>(str2, StringComparison.OrdinalIgnoreCase);
-            logInfo.m_defaultLevel = @enum;
-          }
-          catch (ArgumentException ex)
-          {
-          }
-        }
-        else if (str1.Equals("Verbose", StringComparison.OrdinalIgnoreCase))
-          logInfo.m_verbose = GeneralUtils.ForceBool(str2);
+          return;
       }
-    }
+      foreach (ConfigFile.Line current in configFile.GetLines())
+      {
+          string sectionName = current.m_sectionName;
+          string lineKey = current.m_lineKey;
+          string value = current.m_value;
+          LogInfo logInfo;
+          if (!this.m_logInfos.TryGetValue(sectionName, out logInfo))
+          {
+              logInfo = new LogInfo
+              {
+                  m_name = sectionName
+              };
+              this.m_logInfos.Add(logInfo.m_name, logInfo);
+          }
+          if (lineKey.Equals("ConsolePrinting", StringComparison.OrdinalIgnoreCase))
+          {
+              logInfo.m_consolePrinting = GeneralUtils.ForceBool(value);
+          }
+          else if (lineKey.Equals("ScreenPrinting", StringComparison.OrdinalIgnoreCase))
+          {
+              logInfo.m_screenPrinting = GeneralUtils.ForceBool(value);
+          }
+          else if (lineKey.Equals("FilePrinting", StringComparison.OrdinalIgnoreCase))
+          {
+              logInfo.m_filePrinting = GeneralUtils.ForceBool(value);
+          }
+          else if (lineKey.Equals("MinLevel", StringComparison.OrdinalIgnoreCase))
+          {
+              try
+              {
+                  LogLevel @enum = EnumUtils.GetEnum<LogLevel>(value, StringComparison.OrdinalIgnoreCase);
+                  logInfo.m_minLevel = @enum;
+              }
+              catch (ArgumentException)
+              {
+              }
+          }
+          else if (lineKey.Equals("DefaultLevel", StringComparison.OrdinalIgnoreCase))
+          {
+              try
+              {
+                  LogLevel enum2 = EnumUtils.GetEnum<LogLevel>(value, StringComparison.OrdinalIgnoreCase);
+                  logInfo.m_defaultLevel = enum2;
+              }
+              catch (ArgumentException)
+              {
+              }
+          }
+          else if (lineKey.Equals("Verbose", StringComparison.OrdinalIgnoreCase))
+          {
+              logInfo.m_verbose = GeneralUtils.ForceBool(value);
+          }
+      }
   }
 }

@@ -14,18 +14,10 @@ using UnityEngine;
 public class Cheats
 {
   private static Cheats s_instance;
-  private string m_board;
-  private bool m_loadingStoreChallengePrompt;
+  //private string m_board;
+  //private bool m_loadingStoreChallengePrompt;
   //private AlertPopup m_alert;
-  private static bool s_hasSubscribedToPartyEvents;
-
-  private static Logger PartyLogger
-  {
-    get
-    {
-      return Log.Henry;
-    }
-  }
+  //private static bool s_hasSubscribedToPartyEvents;
 
   public static Cheats Get()
   {
@@ -38,10 +30,6 @@ public class Cheats
     Cheats.s_instance.InitializeImpl();
   }
 
-  public string GetBoard()
-  {
-    return this.m_board;
-  }
 
   public bool IsLaunchingQuickGame()
   {
@@ -70,75 +58,61 @@ public class Cheats
 
   private void InitializeImpl()
   {
-    CheatMgr cheatMgr1 = CheatMgr.Get();
-    if (ApplicationMgr.IsInternal())
-    {
-      cheatMgr1.RegisterCheatHandler("collectionfirstxp", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_collectionfirstxp), "Set the number of page and cover flips to zero", string.Empty, string.Empty);
-      cheatMgr1.RegisterCheatHandler("board", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_board), "Set which board will be loaded on the next game", "<BRM|STW|GVG>", "BRM");
-      cheatMgr1.RegisterCheatHandler("brode", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_brode), "Brode's personal cheat", string.Empty, string.Empty);
-      cheatMgr1.RegisterCheatHandler("resettips", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_resettips), "Resets Innkeeper tips for collection manager", string.Empty, string.Empty);
-      cheatMgr1.RegisterCheatHandler("questcomplete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questcomplete), "Shows the quest complete achievement screen", "<quest_id>", (string) null);
-      cheatMgr1.RegisterCheatHandler("questprogress", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questprogress), "Pop up a quest progress toast", "<title> <description> <progress> <maxprogress>", "Hello World 3 10");
-      cheatMgr1.RegisterCheatHandler("questwelcome", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questwelcome), "Open list of daily quests", "<fromLogin>", "true");
-      cheatMgr1.RegisterCheatHandler("newquest", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_newquest), "Shows a new quest, only usable while a quest popup is active", (string) null, (string) null);
-      cheatMgr1.RegisterCheatHandler("storepassword", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_storepassword), "Show store challenge popup", string.Empty, string.Empty);
-      cheatMgr1.RegisterCheatHandler("retire", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_retire), "Retires your draft deck", string.Empty, string.Empty);
-      cheatMgr1.RegisterCheatHandler("defaultcardback", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_defaultcardback), "Set your cardback as if through the options menu", "<cardback id>", (string) null);
-      cheatMgr1.RegisterCheatHandler("disconnect", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_disconnect), "Disconnects you from a game in progress.", (string) null, (string) null);
-      cheatMgr1.RegisterCheatHandler("seasonroll", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_seasonroll), "Open the season end dialog", "<season number> <ending rank>", "14 3");
-      cheatMgr1.RegisterCheatHandler("playnullsound", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_playnullsound), "Tell SoundManager to play a null sound.", (string) null, (string) null);
-      cheatMgr1.RegisterCheatHandler("spectate", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_spectate), "Connects to a game server to spectate", "<ip_address> <port> <game_handle> <spectator_password> [gameType] [missionId]", (string) null);
-      cheatMgr1.RegisterCheatHandler("party", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_party), "Run a variety of party related commands", "[sub command] [subcommand args]", "list");
-      cheatMgr1.RegisterCheatHandler("cheat", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_cheat), "Send a cheat command to the server", "<command> <arguments>", (string) null);
-      cheatMgr1.RegisterCheatHandler("autohand", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_autohand), "Set whether PhoneUI automatically hides your hand after playing a card", "<true/false>", "true");
-      cheatMgr1.RegisterCheatHandler("fixedrewardcomplete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_fixedrewardcomplete), "Shows the visual for a fixed reward", "<fixed_reward_map_id>", (string) null);
-      cheatMgr1.RegisterCheatHandler("iks", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_iks), "Open InnKeepersSpecial with a custom url", "<url>", (string) null);
-      cheatMgr1.RegisterCheatHandler("adventureChallengeUnlock", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_adventureChallengeUnlock), "Show adventure challenge unlock", "<wing number>", (string) null);
-      cheatMgr1.RegisterCheatHandler("quote", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_quote), string.Empty, "<character> <line> [sound]", "Innkeeper VO_INNKEEPER_FORGE_COMPLETE_22 VO_INNKEEPER_ARENA_COMPLETE");
-      cheatMgr1.RegisterCheatHandler("favoritehero", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_favoritehero), "Change your favorite hero for a class (only works from CollectionManager)", "<class_id> <hero_card_id> <hero_premium>", (string) null);
-      cheatMgr1.RegisterCheatHandler("help", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_help), "Get help for a specific command or list of commands", "<command name>", string.Empty);
-      cheatMgr1.RegisterCheatHandler("example", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_example), "Run an example of this command if one exists", "<command name>", (string) null);
-    }
-    cheatMgr1.RegisterCheatHandler("has", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_HasOption), "Query whether a Game Option exists.", (string) null, (string) null);
-    cheatMgr1.RegisterCheatHandler("get", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_GetOption), "Get the value of a Game Option.", (string) null, (string) null);
-    cheatMgr1.RegisterCheatHandler("set", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_SetOption), "Set the value of a Game Option.", (string) null, (string) null);
-    cheatMgr1.RegisterCheatHandler("delete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_DeleteOption), "Delete a Game Option; the absence of option may trigger default behavior", (string) null, (string) null);
-    cheatMgr1.RegisterCheatHandler("warning", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_warning), "Show a warning message", "<message>", "Test You're a cheater and you've been warned!");
-    cheatMgr1.RegisterCheatHandler("fatal", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_fatal), "Brings up the Fatal Error screen", "<error to display>", "Hearthstone cheated and failed!");
-    cheatMgr1.RegisterCheatHandler("exit", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_exit), "Exit the application", string.Empty, string.Empty);
-    cheatMgr1.RegisterCheatHandler("log", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_log), (string) null, (string) null, (string) null);
-    cheatMgr1.RegisterCheatHandler("alert", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_alert), "Show a popup alert", "header=<string> text=<string> icon=<bool> response=<ok|confirm|cancel|confirm_cancel> oktext=<string> confirmtext=<string>", "header=header text=body text icon=true response=confirm");
-    CheatMgr cheatMgr2 = cheatMgr1;
-    string func1 = "cheat";
-    string[] strArray1 = new string[1];
-    int index1 = 0;
-    string str1 = "c";
-    strArray1[index1] = str1;
-    cheatMgr2.RegisterCheatAlias(func1, strArray1);
-    CheatMgr cheatMgr3 = cheatMgr1;
-    string func2 = "delete";
-    string[] strArray2 = new string[1];
-    int index2 = 0;
-    string str2 = "del";
-    strArray2[index2] = str2;
-    cheatMgr3.RegisterCheatAlias(func2, strArray2);
-    CheatMgr cheatMgr4 = cheatMgr1;
-    string func3 = "alert";
-    string[] strArray3 = new string[2];
-    int index3 = 0;
-    string str3 = "popup";
-    strArray3[index3] = str3;
-    int index4 = 1;
-    string str4 = "dialog";
-    strArray3[index4] = str4;
-    cheatMgr4.RegisterCheatAlias(func3, strArray3);
-    CheatMgr cheatMgr5 = cheatMgr1;
-    string func4 = "exit";
-    string[] strArray4 = new string[1];
-    int index5 = 0;
-    string str5 = "quit";
-    strArray4[index5] = str5;
-    cheatMgr5.RegisterCheatAlias(func4, strArray4);
+      CheatMgr cheatMgr = CheatMgr.Get();
+      if (ApplicationMgr.IsInternal())
+      {
+          cheatMgr.RegisterCheatHandler("collectionfirstxp", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_collectionfirstxp), "Set the number of page and cover flips to zero", string.Empty, string.Empty);
+          cheatMgr.RegisterCheatHandler("board", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_board), "Set which board will be loaded on the next game", "<BRM|STW|GVG>", "BRM");
+          cheatMgr.RegisterCheatHandler("brode", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_brode), "Brode's personal cheat", string.Empty, string.Empty);
+          cheatMgr.RegisterCheatHandler("resettips", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_resettips), "Resets Innkeeper tips for collection manager", string.Empty, string.Empty);
+          cheatMgr.RegisterCheatHandler("questcomplete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questcomplete), "Shows the quest complete achievement screen", "<quest_id>", null);
+          cheatMgr.RegisterCheatHandler("questprogress", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questprogress), "Pop up a quest progress toast", "<title> <description> <progress> <maxprogress>", "Hello World 3 10");
+          cheatMgr.RegisterCheatHandler("questwelcome", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_questwelcome), "Open list of daily quests", "<fromLogin>", "true");
+          cheatMgr.RegisterCheatHandler("newquest", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_newquest), "Shows a new quest, only usable while a quest popup is active", null, null);
+          cheatMgr.RegisterCheatHandler("storepassword", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_storepassword), "Show store challenge popup", string.Empty, string.Empty);
+          cheatMgr.RegisterCheatHandler("retire", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_retire), "Retires your draft deck", string.Empty, string.Empty);
+          cheatMgr.RegisterCheatHandler("defaultcardback", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_defaultcardback), "Set your cardback as if through the options menu", "<cardback id>", null);
+          cheatMgr.RegisterCheatHandler("disconnect", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_disconnect), "Disconnects you from a game in progress.", null, null);
+          cheatMgr.RegisterCheatHandler("seasonroll", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_seasonroll), "Open the season end dialog", "<season number> <ending rank>", "14 3");
+          cheatMgr.RegisterCheatHandler("playnullsound", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_playnullsound), "Tell SoundManager to play a null sound.", null, null);
+          cheatMgr.RegisterCheatHandler("spectate", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_spectate), "Connects to a game server to spectate", "<ip_address> <port> <game_handle> <spectator_password> [gameType] [missionId]", null);
+          cheatMgr.RegisterCheatHandler("party", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_party), "Run a variety of party related commands", "[sub command] [subcommand args]", "list");
+          cheatMgr.RegisterCheatHandler("cheat", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_cheat), "Send a cheat command to the server", "<command> <arguments>", null);
+          cheatMgr.RegisterCheatHandler("autohand", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_autohand), "Set whether PhoneUI automatically hides your hand after playing a card", "<true/false>", "true");
+          cheatMgr.RegisterCheatHandler("fixedrewardcomplete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_fixedrewardcomplete), "Shows the visual for a fixed reward", "<fixed_reward_map_id>", null);
+          cheatMgr.RegisterCheatHandler("iks", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_iks), "Open InnKeepersSpecial with a custom url", "<url>", null);
+          cheatMgr.RegisterCheatHandler("adventureChallengeUnlock", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_adventureChallengeUnlock), "Show adventure challenge unlock", "<wing number>", null);
+          cheatMgr.RegisterCheatHandler("quote", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_quote), string.Empty, "<character> <line> [sound]", "Innkeeper VO_INNKEEPER_FORGE_COMPLETE_22 VO_INNKEEPER_ARENA_COMPLETE");
+          cheatMgr.RegisterCheatHandler("favoritehero", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_favoritehero), "Change your favorite hero for a class (only works from CollectionManager)", "<class_id> <hero_card_id> <hero_premium>", null);
+          cheatMgr.RegisterCheatHandler("help", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_help), "Get help for a specific command or list of commands", "<command name>", string.Empty);
+          cheatMgr.RegisterCheatHandler("example", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_example), "Run an example of this command if one exists", "<command name>", null);
+      }
+      cheatMgr.RegisterCheatHandler("has", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_HasOption), "Query whether a Game Option exists.", null, null);
+      cheatMgr.RegisterCheatHandler("get", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_GetOption), "Get the value of a Game Option.", null, null);
+      cheatMgr.RegisterCheatHandler("set", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_SetOption), "Set the value of a Game Option.", null, null);
+      cheatMgr.RegisterCheatHandler("delete", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_DeleteOption), "Delete a Game Option; the absence of option may trigger default behavior", null, null);
+      cheatMgr.RegisterCheatHandler("warning", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_warning), "Show a warning message", "<message>", "Test You're a cheater and you've been warned!");
+      cheatMgr.RegisterCheatHandler("fatal", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_fatal), "Brings up the Fatal Error screen", "<error to display>", "Hearthstone cheated and failed!");
+      cheatMgr.RegisterCheatHandler("exit", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_exit), "Exit the application", string.Empty, string.Empty);
+      cheatMgr.RegisterCheatHandler("log", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_log), null, null, null);
+      cheatMgr.RegisterCheatHandler("alert", new CheatMgr.ProcessCheatCallback(this.OnProcessCheat_alert), "Show a popup alert", "header=<string> text=<string> icon=<bool> response=<ok|confirm|cancel|confirm_cancel> oktext=<string> confirmtext=<string>", "header=header text=body text icon=true response=confirm");
+      //cheatMgr.RegisterCheatAlias("cheat", new string[]
+      //  {
+      //      "c"
+      //  });
+      cheatMgr.RegisterCheatAlias("delete", new string[]
+		{
+			"del"
+		});
+      cheatMgr.RegisterCheatAlias("alert", new string[]
+		{
+			"popup",
+			"dialog"
+		});
+      cheatMgr.RegisterCheatAlias("exit", new string[]
+		{
+			"quit"
+		});
   }
 
   private void ParseErrorText(string[] args, string rawArgs, out string header, out string message)
@@ -171,37 +145,47 @@ public class Cheats
 
   private Map<string, string> ParseAlertArgs(string rawArgs)
   {
-    Map<string, string> map = new Map<string, string>();
-    int startIndex1 = -1;
-    string index1 = (string) null;
-    for (int index2 = 0; index2 < rawArgs.Length; ++index2)
-    {
-      if ((int) rawArgs[index2] == 61)
+      Map<string, string> map = new Map<string, string>();
+      int num = -1;
+      string text = null;
+      int num3;
+      for (int i = 0; i < rawArgs.Length; i++)
       {
-        int startIndex2 = -1;
-        for (int index3 = index2 - 1; index3 >= 0; --index3)
-        {
-          char c1 = rawArgs[index3];
-          char c2 = rawArgs[index3 + 1];
-          if (!char.IsWhiteSpace(c1))
-            startIndex2 = index3;
-          if (char.IsWhiteSpace(c1) && !char.IsWhiteSpace(c2))
-            break;
-        }
-        if (startIndex2 >= 0)
-        {
-          int num = startIndex2 - 2;
-          if (index1 != null)
-            map[index1] = rawArgs.Substring(startIndex1, num - startIndex1 + 1);
-          startIndex1 = index2 + 1;
-          index1 = rawArgs.Substring(startIndex2, index2 - startIndex2).Trim().ToLowerInvariant();
-        }
+          char c = rawArgs[i];
+          if (c == '=')
+          {
+              int num2 = -1;
+              for (int j = i - 1; j >= 0; j--)
+              {
+                  char c2 = rawArgs[j];
+                  char c3 = rawArgs[j + 1];
+                  if (!char.IsWhiteSpace(c2))
+                  {
+                      num2 = j;
+                  }
+                  if (char.IsWhiteSpace(c2) && !char.IsWhiteSpace(c3))
+                  {
+                      break;
+                  }
+              }
+              if (num2 >= 0)
+              {
+                  num3 = num2 - 2;
+                  if (text != null)
+                  {
+                      map[text] = rawArgs.Substring(num, num3 - num + 1);
+                  }
+                  num = i + 1;
+                  text = rawArgs.Substring(num2, i - num2).Trim().ToLowerInvariant();
+              }
+          }
       }
-    }
-    int num1 = rawArgs.Length - 1;
-    if (index1 != null)
-      map[index1] = rawArgs.Substring(startIndex1, num1 - startIndex1 + 1);
-    return map;
+      num3 = rawArgs.Length - 1;
+      if (text != null)
+      {
+          map[text] = rawArgs.Substring(num, num3 - num + 1);
+      }
+      return map;
   }
 
   //private bool OnAlertProcessed(DialogBase dialog, object userData)
@@ -244,7 +228,7 @@ public class Cheats
 
   private bool OnProcessCheat_board(string func, string[] args, string rawArgs)
   {
-    this.m_board = args[0].ToUpperInvariant();
+//    this.m_board = args[0].ToUpperInvariant();
     return true;
   }
 
@@ -304,8 +288,8 @@ public class Cheats
 
   private bool OnProcessCheat_storepassword(string func, string[] args, string rawArgs)
   {
-    if (this.m_loadingStoreChallengePrompt)
-      return true;
+    //if (this.m_loadingStoreChallengePrompt)
+    //  return true;
     //if ((UnityEngine.Object) this.m_storeChallengePrompt == (UnityEngine.Object) null)
     //{
     //  this.m_loadingStoreChallengePrompt = true;

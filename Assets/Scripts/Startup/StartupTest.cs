@@ -18,6 +18,9 @@ public class StartupTest : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	    if (Input.GetKeyDown(KeyCode.A))// && Input.GetKey(KeyCode.RightAlt))
+        {
+            CheatMgr.Get().ProcessCheat("wireframe");
+        }
 	}
 }

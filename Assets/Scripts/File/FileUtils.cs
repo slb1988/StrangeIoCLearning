@@ -10,13 +10,19 @@ using UnityEngine;
 
 public class FileUtils
 {
-  public static readonly char[] FOLDER_SEPARATOR_CHARS;
+    public static readonly char[] FOLDER_SEPARATOR_CHARS = new char[]
+	{
+		'/',
+		'\\'
+	};
 
   private static string BasePersistentDataPath
   {
     get
-    {
-      return string.Format("{0}/Blizzard/Hearthstone", (object) Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).Replace('\\', '/'));
+      {
+          string text = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+          text = text.Replace('\\', '/');
+          return string.Format("{0}/Leyou/Hearthstone", text);
     }
   }
 
@@ -38,58 +44,52 @@ public class FileUtils
 
   public static string PersistentDataPath
   {
-    get
-    {
-      string path = //!ApplicationMgr.IsInternal() ? FileUtils.PublicPersistentDataPath : 
-          FileUtils.InternalPersistentDataPath;
-      if (!Directory.Exists(path))
+      get
       {
-        try
-        {
-          Directory.CreateDirectory(path);
-        }
-        catch (Exception ex)
-        {
-          Debug.LogError((object) string.Format("FileUtils.PersistentDataPath - Error creating {0}. Exception={1}", (object) path, (object) ex.Message));
-//          Error.AddFatalLoc("GLOBAL_ERROR_ASSET_CREATE_PERSISTENT_DATA_PATH");
-        }
+          string text = null;
+          if (ApplicationMgr.IsInternal())
+          {
+              text = FileUtils.InternalPersistentDataPath;
+          }
+          else
+          {
+              text = FileUtils.PublicPersistentDataPath;
+          }
+          if (!Directory.Exists(text))
+          {
+              try
+              {
+                  Directory.CreateDirectory(text);
+              }
+              catch (Exception ex)
+              {
+                  Debug.LogError(string.Format("FileUtils.PersistentDataPath - Error creating {0}. Exception={1}", text, ex.Message));
+                  //Error.AddFatalLoc("GLOBAL_ERROR_ASSET_CREATE_PERSISTENT_DATA_PATH", new object[0]);
+              }
+          }
+          return text;
       }
-      return path;
-    }
   }
 
   public static string CachePath
   {
-    get
-    {
-      string path = string.Format("{0}/Cache", (object) FileUtils.PersistentDataPath);
-      if (!Directory.Exists(path))
+      get
       {
-        try
-        {
-          Directory.CreateDirectory(path);
-        }
-        catch (Exception ex)
-        {
-          Debug.LogError((object) string.Format("FileUtils.CachePath - Error creating {0}. Exception={1}", (object) path, (object) ex.Message));
-        }
+          string text = string.Format("{0}/Cache", FileUtils.PersistentDataPath);
+          if (!Directory.Exists(text))
+          {
+              try
+              {
+                  Directory.CreateDirectory(text);
+              }
+              catch (Exception ex)
+              {
+                  Debug.LogError(string.Format("FileUtils.CachePath - Error creating {0}. Exception={1}", text, ex.Message));
+              }
+          }
+          return text;
       }
-      return path;
-    }
   }
-
-  static FileUtils()
-  {
-    char[] chArray = new char[2];
-    int index1 = 0;
-    int num1 = 47;
-    chArray[index1] = (char) num1;
-    int index2 = 1;
-    int num2 = 92;
-    chArray[index2] = (char) num2;
-    FileUtils.FOLDER_SEPARATOR_CHARS = chArray;
-  }
-
   public static string MakeSourceAssetPath(DirectoryInfo folder)
   {
     return FileUtils.MakeSourceAssetPath(folder.FullName);
