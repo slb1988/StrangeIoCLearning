@@ -11,18 +11,14 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-using SilentOrbit.ProtocolBuffers;
-
 namespace Tutorial
 {
-    public partial class Person
+    public partial class Person : IProtoBuf
     {
         /// <summary>Helper: create a new instance to deserializing into</summary>
         public void Deserialize(Stream stream)
         {
-            //var instance = new Person();
             Deserialize(stream, this);
-            //return instance;
         }
 
         /// <summary>Helper: create a new instance to deserializing into</summary>
@@ -219,35 +215,50 @@ namespace Tutorial
             return instance;
         }
 
+        /// <summary>Get SerializeSize</summary>
         public uint GetSerializedSize()
         {
             uint num = 0u;
 
-            {
-                num += 1u;
-                uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Name);
-                num += ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
-            }
+            if (this.Name == null)
+                throw new global::SilentOrbit.ProtocolBuffers.ProtocolBufferException("Name is required by the proto specification.");
 
             {
                 num += 1u;
-                num += ProtocolParser.SizeOfUInt64((ulong)this.Id);
+                uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Name);
+                num += global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
             }
+
+
             {
                 num += 1u;
-                uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Email);
-                num += ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
+                num += global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt64((ulong)this.Id);
             }
-            for (int i = 0; Phone != null && i < Phone.Count; i++)
+
+            if (this.Email != null)
             {
-                num += 1u;
-                uint serializeSize = Phone[i].GetSerializedSize();
-                num += serializeSize + ProtocolParser.SizeOfUInt32(serializeSize);
+                {
+                    num += 1u;
+                    uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Email);
+                    num += global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
+                }
+            }
+
+            if (this.Phone != null)
+            {
+                foreach (var i4 in this.Phone)
+                {
+                    {
+                        num += 1u;
+                        uint serializedSize = i4.GetSerializedSize();
+                        num += serializedSize + global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt32(serializedSize);
+                    }
+                }
             }
 
             return num;
         }
-
+        /// <summary>Serialize this into the stream</summary>
         public void Serialize(Stream stream)
         {
             Serialize(stream, this);
@@ -306,14 +317,12 @@ namespace Tutorial
             stream.Write(data, 0, data.Length);
         }
 
-        public partial class PhoneNumber
+        public partial class PhoneNumber : IProtoBuf
         {
             /// <summary>Helper: create a new instance to deserializing into</summary>
             public void Deserialize(Stream stream)
             {
-                //var instance = new PhoneNumber();
                 Deserialize(stream, this);
-                //return instance;
             }
 
             /// <summary>Helper: create a new instance to deserializing into</summary>
@@ -480,20 +489,31 @@ namespace Tutorial
                 return instance;
             }
 
+            /// <summary>Get SerializeSize</summary>
             public uint GetSerializedSize()
             {
                 uint num = 0u;
 
-                num += 1;
-                uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Number);
-                num += ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
+                if (this.Number == null)
+                    throw new global::SilentOrbit.ProtocolBuffers.ProtocolBufferException("Number is required by the proto specification.");
 
-                num += 1;
-                num += ProtocolParser.SizeOfUInt64((ulong)this.Type);
+                {
+                    num += 1u;
+                    uint byteCount = (uint)Encoding.UTF8.GetByteCount(this.Number);
+                    num += global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt32(byteCount) + byteCount;
+                }
+
+                if (this.Type != PhoneType.HOME)
+                {
+                    {
+                        num += 1u;
+                        num += global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt64((ulong)this.Type);
+                    }
+                }
 
                 return num;
             }
-
+            /// <summary>Serialize this into the stream</summary>
             public void Serialize(Stream stream)
             {
                 Serialize(stream, this);
@@ -703,24 +723,29 @@ namespace Tutorial
             return instance;
         }
 
-        public void Serialize(Stream stream)
-        {
-            Serialize(stream, this);
-        }
-
+        /// <summary>Get SerializeSize</summary>
         public uint GetSerializedSize()
         {
-            //return 46;
             uint num = 0u;
 
-            for (int i = 0; Person != null && i < Person.Count; i++)
+            if (this.Person != null)
             {
-                num += 1u;
-                uint serializedSize = Person[i].GetSerializedSize();
-                num += serializedSize + ProtocolParser.SizeOfUInt32(serializedSize);
+                foreach (var i1 in this.Person)
+                {
+                    {
+                        num += 1u;
+                        uint serializedSize = i1.GetSerializedSize();
+                        num += serializedSize + global::SilentOrbit.ProtocolBuffers.ProtocolParser.SizeOfUInt32(serializedSize);
+                    }
+                }
             }
 
             return num;
+        }
+        /// <summary>Serialize this into the stream</summary>
+        public void Serialize(Stream stream)
+        {
+            Serialize(stream, this);
         }
 
         /// <summary>Serialize the instance into the stream</summary>
