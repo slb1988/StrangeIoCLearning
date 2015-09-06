@@ -1,0 +1,13 @@
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\Tests.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\Tests.pdb
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\nunit.framework.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\protobuf-net.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\Test.exe
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\TestB.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\TestB.pdb
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\Test.pdb
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\nunit.framework.xml
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\bin\Debug\protobuf-net.xml
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\obj\Debug\Tests.csprojResolveAssemblyReference.cache
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\obj\Debug\Tests.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\Tests\obj\Debug\Tests.pdb

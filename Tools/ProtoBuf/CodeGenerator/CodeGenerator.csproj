@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{108DF716-5E86-4515-836F-1AC211CA648B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SilentOrbit.ProtocolBuffers</RootNamespace>
+    <AssemblyName>CodeGenerator</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\bin\CodeGenerator\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <Commandlineparameters>--fix-nameclash ../../../TestProgram/ProtoSpec/ImportAll.proto --output ../../../TestProgram/Generated/Generated.cs --ctor --utc</Commandlineparameters>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\bin\CodeGenerator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <Commandlineparameters>--fix-nameclash ../../../TestProgram/ProtoSpec/ImportAll.proto --ctor --utc --output ../../../TestProgram/Generated/Generated.cs</Commandlineparameters>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SilentOrbit.ProtocolBuffers.Builder</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommandLine, Version=2.0.0.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\CodeGenerator\Debug\CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Builder.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ProtoParser.cs" />
+    <Compile Include="TokenReader.cs" />
+    <Compile Include="ProtoPrepare.cs" />
+    <Compile Include="Proto\Field.cs" />
+    <Compile Include="Proto\Wire.cs" />
+    <Compile Include="CodeGenerator\MessageCode.cs" />
+    <Compile Include="CodeGenerator\ProtoCode.cs" />
+    <Compile Include="Proto\FieldRule.cs" />
+    <Compile Include="Proto\ProtoFormatException.cs" />
+    <Compile Include="Proto\ProtoMessage.cs" />
+    <Compile Include="Proto\ProtoEnum.cs" />
+    <Compile Include="Proto\ProtoType.cs" />
+    <Compile Include="Proto\ProtoBuiltin.cs" />
+    <Compile Include="CodeGenerator\FieldSerializer.cs" />
+    <Compile Include="CodeGenerator\MessageSerializer.cs" />
+    <Compile Include="Proto\ProtoCollection.cs" />
+    <Compile Include="SourcePath.cs" />
+    <Compile Include="LocalParser.cs" />
+    <Compile Include="Proto\IComment.cs" />
+    <Compile Include="Proto\Search.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="CodeGenerator\ProtocolParser.cs" />
+    <Compile Include="FileParser.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParser.cs">
+      <LogicalName>ProtocolParser</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserFixed.cs">
+      <LogicalName>ProtocolParserFixed</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserKey.cs">
+      <LogicalName>ProtocolParserKey</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserVarInt.cs">
+      <LogicalName>ProtocolParserVarInt</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserMemory.cs">
+      <LogicalName>ProtocolParserMemory</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserExceptions.cs">
+      <LogicalName>ProtocolParserExceptions</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProtocolParser\ProtocolParserMemory4.cs">
+      <LogicalName>ProtocolParserMemory4</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy EolMarker="Windows" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="NewLine" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
+          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csrc" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeWriter\CodeWriter.csproj">
+      <Project>{FFFA67D7-6E0B-4C5C-8B3C-9DDED536AC4A}</Project>
+      <Name>CodeWriter</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\TestLibrary\bin\Debug\TestB.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\TestLibrary\bin\Debug\TestB.pdb
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\TestLibrary\obj\Debug\TestLibrary.csprojResolveAssemblyReference.cache
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\TestLibrary\obj\Debug\TestB.dll
+D:\workshop\My GitHub\1\StrangeIoCLearning\Tools\ProtoBuf\TestLibrary\obj\Debug\TestB.pdb
