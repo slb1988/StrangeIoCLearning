@@ -16,6 +16,7 @@
 using System;
 using UnityEngine;
 using strange.extensions.context.impl;
+using strange.extensions.context.api;
 
 namespace strange.examples.myfirstproject
 {
@@ -33,7 +34,9 @@ namespace strange.examples.myfirstproject
 			//context = new MyFirstContext(this, ContextStartupFlags.MANUAL_MAPPING);
 			//context = new MyFirstContext(this, ContextStartupFlags.MANUAL_MAPPING | ContextStartupFlags.MANUAL_LAUNCH);
 			//
-			//These flags allow you, when necessary, to interrupt the startup sequence.
+            //These flags allow you, when necessary, to interrupt the startup sequence.
+            //context.Start();
+            //context.Launch();
 		}
 	}
 }
